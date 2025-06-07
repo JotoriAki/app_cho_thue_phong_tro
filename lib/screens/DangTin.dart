@@ -185,7 +185,7 @@ class _DangTinState extends State<DangTin> {
               const SizedBox(height: 16),
               _buildTextField(
                 _priceController,
-                "Giá bán (VND) *",
+                "Giá thuê (VND) *",
                 keyboardType: TextInputType.number,
                 validator: _numberValidator,
               ),

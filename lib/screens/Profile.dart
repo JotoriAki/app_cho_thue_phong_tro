@@ -375,12 +375,12 @@ class Profile extends StatelessWidget {
                       padding: const EdgeInsets.all(10),
                       child: SizedBox(
                         width: 80,
-                        height: 80,
+                        height: 120,
                         child: CircleAvatar(
                           radius: 50,
                           child: ClipOval(
                             child: Image.network(
-                              isLoggedIn ? avatar : defaultAvatar,
+                              isLoggedIn && (avatar != null && avatar.isNotEmpty) ? avatar : defaultAvatar,
                               width: 80,
                               height: 80,
                               fit: BoxFit.cover,

@@ -31,9 +31,11 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   int _selectedIndex = 0;
   String _userName = "";
+  late AnimationController _animationController;
+  late Animation<double> _scaleAnimation;
 
   final List<Widget> _pages = [
     HomePage(),
@@ -43,7 +45,31 @@ class _MyHomePageState extends State<MyHomePage> {
     Profile(),
   ];
 
+  @override
+  void initState() {
+    super.initState();
+    _loadUserName();
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 200),
+      vsync: this,
+    );
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.95).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
   void _onItemTapped(int index) async {
+    // Animation cho button press
+    _animationController.forward().then((_) {
+      _animationController.reverse();
+    });
+
     if (index == 2) {
       // "Đăng tin trọ" ở index 2
       if (_userName.isEmpty) {
@@ -76,151 +102,200 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  @override
-  void initState() {
-    super.initState();
-    _loadUserName();
-  }
+Future<void> _loadUserName() async {
+  final prefs = await SharedPreferences.getInstance();
+  setState(() {
+    _userName = prefs.getString('userName') ?? "";
+    _pages[2] = DangTin(userName: _userName);
+  });
+}
 
-  Future<void> _loadUserName() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _userName = prefs.getString('userName') ?? "";
-      _pages[2] = DangTin(userName: _userName);
-    });
+  Widget _buildNavItem({
+    required IconData icon,
+    required String label,
+    required int index,
+    bool isCenter = false,
+  }) {
+    final isSelected = _selectedIndex == index;
+    
+    return Expanded(
+      flex: isCenter ? 2 : 1,
+      child: AnimatedBuilder(
+        animation: _scaleAnimation,
+        builder: (context, child) {
+          return Transform.scale(
+            scale: isSelected ? _scaleAnimation.value : 1.0,
+            child: GestureDetector(
+              onTap: () => _onItemTapped(index),
+              child: Container(
+                margin: EdgeInsets.symmetric(
+                  horizontal: isCenter ? 4 : 1,
+                  vertical: 0,
+                ),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(isCenter ? 25 : 20),
+                  gradient: isSelected
+                      ? LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: isCenter
+                              ? [
+                                  const Color(0xFFFFD700),
+                                  const Color(0xFFFFA500),
+                                ]
+                              : [
+                                  const Color(0xFFFF6B35),
+                                  const Color(0xFFFF8E53),
+                                ],
+                        )
+                      : null,
+                  color: isSelected ? null : Colors.transparent,
+                  boxShadow: isSelected
+                      ? [
+                          BoxShadow(
+                            color: (isCenter ? Colors.amber : Colors.orange)
+                                .withOpacity(0.2),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ]
+                      : [],
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (isCenter && index == 2)
+                      Container(
+                        width: 32,
+                        height: 32,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: const LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              Color(0xFFFFD700),
+                              Color(0xFFFFA500),
+                            ],
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.amber.withOpacity(0.3),
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Icon(
+                          icon,
+                          color: isSelected ? Colors.white : Colors.black87,
+                          size: 18,
+                        ),
+                      )
+                    else
+                      Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: isSelected
+                              ? Colors.white.withOpacity(0.2)
+                              : Colors.transparent,
+                        ),
+                        child: Icon(
+                          icon,
+                          color: isSelected ? Colors.white : Colors.grey[600],
+                          size: isSelected ? 20 : 18,
+                        ),
+                      ),
+                    const SizedBox(height: 1),
+                    Text(
+                      label,
+                      style: TextStyle(
+                        color: isSelected
+                            ? (isCenter ? Colors.black87 : Colors.white)
+                            : Colors.grey[600],
+                        fontSize: 10,
+                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                        decoration: TextDecoration.none,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: IndexedStack(index: _selectedIndex, children: _pages),
-      bottomNavigationBar: BottomAppBar(
-        child: Container(
-          height: 70,
-          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                flex: 2,
-                child: GestureDetector(
-                  onTap: () => _onItemTapped(0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.home,
-                        color:
-                            _selectedIndex == 0 ? Colors.orange : Colors.grey,
-                        size: 30,
-                      ),
-                      Text(
-                        "Trang chủ",
-                        style: TextStyle(
-                          color:
-                              _selectedIndex == 0 ? Colors.orange : Colors.grey,
-                          fontSize: 12,
-                          decoration: TextDecoration.none,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              // Nút Đăng tin trọ (ở giữa)
-              Expanded(
-                flex: 1,
-                child: GestureDetector(
-                  onTap: () => _onItemTapped(2),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        width: 39,
-                        height: 39,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.yellow,
-                        ),
-                        child: const Icon(
-                          Icons.edit,
-                          color: Colors.black,
-                          size: 25,
-                        ),
-                      ),
-                      Text(
-                        "Đăng tin trọ",
-                        style: TextStyle(
-                          color:
-                              _selectedIndex == 2
-                                  ? Colors.orange
-                                  : const Color.fromRGBO(29, 27, 32, 1.0),
-                          fontSize: 12,
-                          decoration: TextDecoration.none,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              // Nút Quản lý trọ
-              Expanded(
-                flex: 1,
-                child: GestureDetector(
-                  onTap: () => _onItemTapped(3),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.list,
-                        color:
-                            _selectedIndex == 3 ? Colors.orange : Colors.grey,
-                        size: 30,
-                      ),
-                      Text(
-                        "Quản lý trọ",
-                        style: TextStyle(
-                          color:
-                              _selectedIndex == 3 ? Colors.orange : Colors.grey,
-                          fontSize: 12,
-                          decoration: TextDecoration.none,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              // Nút Tài khoản
-              Expanded(
-                flex: 1,
-                child: GestureDetector(
-                  onTap: () => _onItemTapped(4),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.person,
-                        color:
-                            _selectedIndex == 4 ? Colors.orange : Colors.grey,
-                        size: 30,
-                      ),
-                      Text(
-                        "Tài khoản",
-                        style: TextStyle(
-                          color:
-                              _selectedIndex == 4 ? Colors.orange : Colors.grey,
-                          fontSize: 12,
-                          decoration: TextDecoration.none,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFFF8F9FA),
+              Color(0xFFFFFFFF),
             ],
           ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 20,
+              offset: const Offset(0, -5),
+            ),
+          ],
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(25),
+            topRight: Radius.circular(25),
+          ),
         ),
-      ),
-    );
+        child: ClipRRect(
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(25),
+            topRight: Radius.circular(25),
+          ),
+          child: BottomAppBar(
+            color: Colors.transparent,
+            elevation: 0,
+            child: SizedBox(
+              height: 65,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _buildNavItem(
+                    icon: Icons.home_rounded,
+                    label: "Trang chủ",
+                    index: 0,
+                  ),
+                  _buildNavItem(
+                    icon: Icons.edit_rounded,
+                    label: "Đăng tin trọ",
+                    index: 2,
+                    isCenter: true,
+                  ),
+                  _buildNavItem(
+                    icon: Icons.list_alt_rounded,
+                    label: "Quản lý trọ",
+                    index: 3,
+                  ),
+                  _buildNavItem(
+                    icon: Icons.person_rounded,
+                    label: "Tài khoản",
+                    index: 4,
+                  ),
+                ],
+              ),
+            ),
+            ),
+          ),
+        ),
+      );
   }
 }
