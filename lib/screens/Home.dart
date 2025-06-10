@@ -30,7 +30,7 @@ class HomePageState extends State<HomePage> {
 
   Future<void> _loadData() async {
     setState(() {
-      _isLoading = true; // Hiển thị loading khi bắt đầu tải dữ liệu
+      _isLoading = true;
     });
     try {
       await Future.wait([fetchPhongTroData(), fetchSavedRooms()]);
@@ -114,21 +114,6 @@ class HomePageState extends State<HomePage> {
       }
     } catch (e) {
       print('Lỗi khi gọi API getAll: $e');
-    }
-  }
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-
-    if (index == 2) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const LoginPage()),
-      );
-    } else if (index == 3) {
-      // TODO: Chuyển đến màn hình khác nếu cần
     }
   }
 
@@ -268,99 +253,182 @@ class HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF3F6FB),
       appBar: AppBar(
-        title: const Text('Trang Chủ'),
-        backgroundColor: Colors.yellow[700],
+        elevation: 0,
+        title: const Text(
+          'Trang Chủ',
+          style: TextStyle(
+            color: Color(0xFF222222),
+            fontWeight: FontWeight.bold,
+            fontSize: 22,
+            letterSpacing: 1,
+          ),
+        ),
+        backgroundColor: Colors.white,
+        centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.notifications, color: Color(0xFF222222)),
+            onPressed: () {},
+          ),
+        ],
       ),
       body: RefreshIndicator(
-        onRefresh: _loadData, // Gọi _loadData khi kéo để làm mới
-        child:
-            _isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : SingleChildScrollView(
-                  physics:
-                      const AlwaysScrollableScrollPhysics(), // Đảm bảo luôn có thể kéo
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.fromLTRB(16, 10, 16, 8),
-                        color: Colors.yellow[700],
+        onRefresh: _loadData,
+        child: _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Banner
+                    Container(
+                      width: double.infinity,
+                      margin: const EdgeInsets.only(bottom: 18),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [Colors.yellow[700]!, Colors.orange[300]!],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: const BorderRadius.only(
+                          bottomLeft: Radius.circular(15),
+                          bottomRight: Radius.circular(15),
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.yellow[700]!.withOpacity(0.18),
+                            blurRadius: 12,
+                            offset: const Offset(0, 6),
+                          ),
+                        ],
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(20, 28, 20, 28),
                         child: Row(
                           children: [
                             Expanded(
-                              child: DropdownButton<String>(
-                                value: _selectedDistrict,
-                                hint: const Text('Chọn quận'),
-                                isExpanded: true,
-                                items:
-                                    getDistricts().map((String district) {
-                                      return DropdownMenuItem<String>(
-                                        value: district,
-                                        child: Text(district),
-                                      );
-                                    }).toList(),
-                                onChanged: (String? newValue) {
-                                  filterRoomsByDistrict(newValue);
-                                },
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                          ],
-                        ),
-                      ),
-                      const Padding(
-                        padding: EdgeInsets.all(16.0),
-                        child: Text(
-                          "Chợ Tốt Có Gì Mới?",
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: GridView.count(
-                          crossAxisCount: 2,
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          crossAxisSpacing: 10,
-                          mainAxisSpacing: 10,
-                          children: [
-                            for (var item in _filteredPhongTroData)
-                              GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder:
-                                          (context) => RoomDetailPage(
-                                            roomId: item['_id'],
+                              child: DropdownButtonHideUnderline(
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(16),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.07),
+                                        blurRadius: 6,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                                    child: DropdownButton<String>(
+                                      value: _selectedDistrict,
+                                      hint: const Text('Chọn quận'),
+                                      isExpanded: true,
+                                      icon: const Icon(Icons.keyboard_arrow_down),
+                                      items: getDistricts().map((String district) {
+                                        return DropdownMenuItem<String>(
+                                          value: district,
+                                          child: Text(
+                                            district,
+                                            style: const TextStyle(fontWeight: FontWeight.w500),
                                           ),
+                                        );
+                                      }).toList(),
+                                      onChanged: (String? newValue) {
+                                        filterRoomsByDistrict(newValue);
+                                      },
                                     ),
-                                  );
-                                },
-                                child: _buildRoomCard(
-                                  item['title'] ?? 'Không có tiêu đề',
-                                  item['price'] != null
-                                      ? '${NumberFormat.currency(locale: 'vi_VN', symbol: '₫').format(item['price'])}/Tháng'
-                                      : 'Không có giá',
-                                  item['images'] != null &&
-                                          item['images'].isNotEmpty
-                                      ? item['images'][0]
-                                      : 'assets/placeholder.jpg',
-                                  item['_id'] ?? '',
-                                  item['address'] ?? 'Không xác định',
-                                  item['status'] ?? 'rented',
+                                  ),
                                 ),
                               ),
+                            ),
+                            const SizedBox(width: 18),
+                            Material(
+                              color: Colors.white,
+                              shape: const CircleBorder(),
+                              elevation: 2,
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(30),
+                                onTap: () {},
+                                child: Padding(
+                                  padding: const EdgeInsets.all(10),
+                                  child: Icon(Icons.search, color: Colors.yellow[700], size: 30),
+                                ),
+                              ),
+                            ),
                           ],
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                    // Section title
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(24, 8, 24, 12),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.star_rounded, color: Colors.amber, size: 28),
+                          const SizedBox(width: 10),
+                          const Text(
+                            "Chợ Tốt Có Gì Mới?",
+                            style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF222222),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // Grid
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: GridView.builder(
+                        itemCount: _filteredPhongTroData.length,
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 1,
+                          crossAxisSpacing: 18,
+                          mainAxisSpacing: 18,
+                          childAspectRatio: 2.7,
+                        ),
+                        itemBuilder: (context, index) {
+                          final item = _filteredPhongTroData[index];
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => RoomDetailPage(
+                                    roomId: item['_id'],
+                                  ),
+                                ),
+                              );
+                            },
+                            child: _buildRoomCard(
+                              item['title'] ?? 'Không có tiêu đề',
+                              item['price'] != null
+                                  ? '${NumberFormat.currency(locale: 'vi_VN', symbol: '₫').format(item['price'])}/Tháng'
+                                  : 'Không có giá',
+                              item['images'] != null && item['images'].isNotEmpty
+                                  ? item['images'][0]
+                                  : 'assets/placeholder.jpg',
+                              item['_id'] ?? '',
+                              item['address'] ?? 'Không xác định',
+                              item['status'] ?? 'rented',
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 28),
+                  ],
                 ),
+              ),
       ),
     );
   }
@@ -376,120 +444,160 @@ class HomePageState extends State<HomePage> {
     final isSaved = _savedRoomIds.contains(id);
     final districtAndCity = extractDistrictAndCity(address);
 
-    return Card(
-      elevation: 2,
-      clipBehavior: Clip.antiAlias,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(22),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.09),
+            blurRadius: 14,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Row(
         children: [
+          // Image
           Stack(
             children: [
               ClipRRect(
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(4),
+                borderRadius: const BorderRadius.horizontal(
+                  left: Radius.circular(22),
                 ),
-                child:
-                    isValidUrl(imagePath)
-                        ? Image.network(
-                          imagePath,
-                          height: 80,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                          loadingBuilder: (context, child, loadingProgress) {
-                            if (loadingProgress == null) {
-                              return child;
-                            }
-                            return Container(
-                              height: 80,
-                              color: Colors.grey[300],
-                              child: const Center(
-                                child: CircularProgressIndicator(),
-                              ),
-                            );
-                          },
-                          errorBuilder: (context, error, stackTrace) {
-                            return Container(
-                              height: 80,
-                              color: Colors.grey[300],
-                              child: const Center(
-                                child: Icon(
-                                  Icons.broken_image,
-                                  size: 50,
-                                  color: Colors.black,
-                                ),
-                              ),
-                            );
-                          },
-                        )
-                        : Container(
-                          height: 80,
-                          color: Colors.grey[300],
-                          child: const Center(
-                            child: Icon(
-                              Icons.broken_image,
-                              size: 50,
-                              color: Colors.black,
+                child: isValidUrl(imagePath)
+                    ? Image.network(
+                        imagePath,
+                        height: 120,
+                        width: 120,
+                        fit: BoxFit.cover,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) {
+                            return child;
+                          }
+                          return Container(
+                            height: 120,
+                            width: 120,
+                            color: Colors.grey[200],
+                            child: const Center(
+                              child: CircularProgressIndicator(),
                             ),
+                          );
+                        },
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            height: 120,
+                            width: 120,
+                            color: Colors.grey[200],
+                            child: const Center(
+                              child: Icon(
+                                Icons.broken_image,
+                                size: 50,
+                                color: Colors.black,
+                              ),
+                            ),
+                          );
+                        },
+                      )
+                    : Container(
+                        height: 120,
+                        width: 120,
+                        color: Colors.grey[200],
+                        child: const Center(
+                          child: Icon(
+                            Icons.broken_image,
+                            size: 50,
+                            color: Colors.black,
                           ),
                         ),
+                      ),
               ),
               Positioned(
-                top: 8,
-                right: 8,
-                child: IconButton(
-                  icon: Icon(
-                    isSaved ? Icons.bookmark : Icons.bookmark_border,
-                    color: Colors.yellow[700],
+                top: 10,
+                right: 10,
+                child: GestureDetector(
+                  onTap: () => toggleSaveRoom(id),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.92),
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.10),
+                          blurRadius: 6,
+                        ),
+                      ],
+                    ),
+                    padding: const EdgeInsets.all(7),
+                    child: Icon(
+                      isSaved ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
+                      color: Colors.yellow[700],
+                      size: 26,
+                    ),
                   ),
-                  onPressed: () {
-                    toggleSaveRoom(id);
-                  },
                 ),
               ),
             ],
           ),
+          // Info
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.all(6.0),
+              padding: const EdgeInsets.fromLTRB(18, 14, 18, 14),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
                     title,
                     style: const TextStyle(
-                      fontSize: 14,
+                      fontSize: 17,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF222222),
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    price,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: Color(0xFFE53935),
                       fontWeight: FontWeight.bold,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 2),
-                  Text(
-                    price,
-                    style: const TextStyle(fontSize: 14, color: Colors.red),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      const Icon(Icons.location_on, size: 16, color: Colors.grey),
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: Text(
+                          districtAndCity,
+                          style: const TextStyle(fontSize: 13, color: Colors.black54),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
                   ),
-                  Text(
-                    districtAndCity,
-                    style: const TextStyle(fontSize: 12, color: Colors.black),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 2),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 2,
-                    ),
-                    color: status == 'available' ? Colors.green : Colors.red,
-                    child: Text(
-                      status == 'available' ? 'Còn trống' : 'Đã cho thuê',
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
+                  const Spacer(),
+                  Align(
+                    alignment: Alignment.bottomRight,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
+                      decoration: BoxDecoration(
+                        color: status == 'available' ? Colors.green[600] : Colors.red[400],
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        status == 'available' ? 'Còn trống' : 'Đã cho thuê',
+                        style: const TextStyle(
+                          fontSize: 13,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ),

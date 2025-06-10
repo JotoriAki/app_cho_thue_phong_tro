@@ -33,7 +33,7 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> saveUserToken(String token) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('userToken', token);
-    print('Token đã lưu: $token'); // Debug token
+    print('Token đã lưu: $token');
   }
 
   Future<void> saveUserName(String userName) async {
@@ -53,8 +53,8 @@ class _LoginPageState extends State<LoginPage> {
         body: jsonEncode({'email': email, 'password': password}),
       );
 
-      print('Trạng thái đăng nhập: ${response.statusCode}'); // Debug trạng thái
-      print('Dữ liệu phản hồi đăng nhập: ${response.body}'); // Debug dữ liệu
+      print('Trạng thái đăng nhập: ${response.statusCode}');
+      print('Dữ liệu phản hồi đăng nhập: ${response.body}');
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -62,23 +62,19 @@ class _LoginPageState extends State<LoginPage> {
         final user = data['user'];
         final userName = user['username'];
 
-        // Lưu trạng thái đăng nhập
         await saveLoginStatus(true);
         await saveUserEmail(email);
         await saveUserToken(token);
         await saveUserName(userName);
 
-        // Gọi fetchAndSaveUserData để lấy và lưu thông tin user
         await Profile().fetchAndSaveUserData();
 
-        // Chuyển sang trang khác
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (context) => MyApp()),
           (route) => false,
         );
 
-        // Hiển thị thông báo thành công
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Đăng nhập thành công! Xin chào ${user['username']}'),
@@ -94,7 +90,7 @@ class _LoginPageState extends State<LoginPage> {
         );
       }
     } catch (e) {
-      print('Lỗi khi đăng nhập: $e'); // Debug lỗi
+      print('Lỗi khi đăng nhập: $e');
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Có lỗi xảy ra: $e')));
@@ -104,107 +100,150 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.yellow[700],
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        title: Container(height: 40),
-        centerTitle: true,
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                "Đăng nhập",
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: _emailController,
-                decoration: InputDecoration(
-                  labelText: "Email",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
+      backgroundColor: const Color.fromARGB(255, 251, 251, 251),
+      body: Center(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 28.0, vertical: 24),
+            child: Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(24),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 16,
+                    offset: Offset(0, 8),
                   ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: _passwordController,
-                obscureText: _isObscured,
-                decoration: InputDecoration(
-                  labelText: "Mật khẩu",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  suffixIcon: IconButton(
-                    onPressed: () {
-                      setState(() {
-                        _isObscured = !_isObscured;
-                      });
-                    },
-                    icon: Icon(
-                      _isObscured ? Icons.visibility : Icons.visibility_off,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 8),
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton(
-                  onPressed: () {},
-                  child: const Text("Quên mật khẩu?"),
-                ),
-              ),
-              const SizedBox(height: 16),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _login,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.orangeAccent,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                  ),
-                  child: const Text(
-                    "ĐĂNG NHẬP",
-                    style: TextStyle(fontSize: 16, color: Colors.white),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Row(
-                children: const [
-                  Expanded(child: Divider()),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 8.0),
-                    child: Text("Hoặc đăng nhập bằng"),
-                  ),
-                  Expanded(child: Divider()),
                 ],
               ),
-              const SizedBox(height: 16),
-              Center(
-                child: RichText(
-                  text: TextSpan(
-                    text: "Chưa có tài khoản? ",
-                    style: const TextStyle(color: Colors.black),
-                    children: [
-                      TextSpan(
-                        text: "Đăng ký tài khoản mới",
-                        style: const TextStyle(color: Colors.blue),
-                        recognizer:
-                            TapGestureRecognizer()
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.lock_outline, size: 64, color: Colors.orangeAccent),
+                  const SizedBox(height: 12),
+                  const Text(
+                    "Chào mừng trở lại!",
+                    style: TextStyle(
+                      fontSize: 26,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.orangeAccent,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    "Đăng nhập để tiếp tục",
+                    style: TextStyle(fontSize: 16, color: Colors.black54),
+                  ),
+                  const SizedBox(height: 32),
+                  TextField(
+                    controller: _emailController,
+                    decoration: InputDecoration(
+                      prefixIcon: Icon(Icons.email_outlined),
+                      labelText: "Email",
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        filled: true,
+                        enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                        ),
+                      fillColor: const Color(0xFFF9F9F9),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  TextField(
+                    controller: _passwordController,
+                    obscureText: _isObscured,
+                    decoration: InputDecoration(
+                      prefixIcon: Icon(Icons.lock_outline),
+                      labelText: "Mật khẩu",
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        filled: true,
+                        enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                        ),
+                      fillColor:const Color(0xFFF9F9F9),
+                      suffixIcon: IconButton(
+                        onPressed: () {
+                          setState(() {
+                            _isObscured = !_isObscured;
+                          });
+                        },
+                        icon: Icon(
+                          _isObscured ? Icons.visibility : Icons.visibility_off,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: () {},
+                      child: const Text(
+                        "Quên mật khẩu?",
+                        style: TextStyle(color: Colors.orangeAccent),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: _login,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.orangeAccent,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 4,
+                      ),
+                      child: const Text(
+                        "ĐĂNG NHẬP",
+                        style: TextStyle(fontSize: 18, color: Colors.white),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    children: const [
+                      Expanded(child: Divider()),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 8.0),
+                        child: Text("Hoặc"),
+                      ),
+                      Expanded(child: Divider()),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  // Có thể thêm nút đăng nhập Google/Facebook ở đây nếu muốn
+                  Center(
+                    child: RichText(
+                      text: TextSpan(
+                        text: "Chưa có tài khoản? ",
+                        style: const TextStyle(color: Colors.black),
+                        children: [
+                          TextSpan(
+                            text: "Đăng ký ngay",
+                            style: const TextStyle(
+                                color: Colors.orangeAccent,
+                                fontWeight: FontWeight.bold),
+                            recognizer: TapGestureRecognizer()
                               ..onTap = () {
                                 Navigator.push(
                                   context,
@@ -213,12 +252,14 @@ class _LoginPageState extends State<LoginPage> {
                                   ),
                                 );
                               },
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
-                ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),

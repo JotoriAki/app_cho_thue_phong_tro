@@ -23,9 +23,6 @@ class Profile extends StatelessWidget {
     final username = prefs.getString('username') ?? 'Đăng nhập / Đăng ký';
     final avatar = prefs.getString('avatar') ?? defaultAvatar;
     final email = prefs.getString('email') ?? '';
-    print(
-      'isLoggedIn: $isLoggedIn, username: $username, avatar: $avatar, email: $email',
-    );
     return {
       'isLoggedIn': isLoggedIn,
       'username': username,
@@ -59,11 +56,9 @@ class Profile extends StatelessWidget {
             posts.where((post) => post['status'] == 'rented').length;
         return {'available': availableCount, 'rented': rentedCount};
       } else {
-        print('Lỗi server: ${response.statusCode} - ${response.body}');
         return {'available': 0, 'rented': 0};
       }
     } catch (e) {
-      print('Lỗi khi gọi API: $e');
       return {'available': 0, 'rented': 0};
     }
   }
@@ -80,44 +75,24 @@ class Profile extends StatelessWidget {
   }
 
   Future<void> fetchAndSaveUserData() async {
-    print('Bắt đầu gọi fetchAndSaveUserData');
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('userToken');
-    print('Token: $token');
-
-    if (token == null || token.isEmpty) {
-      print('Không tìm thấy token. Không thể gọi API.');
-      return;
-    }
+    if (token == null || token.isEmpty) return;
 
     final url = 'http://${Api.baseUrl}:8000/api/user/token';
-    print('URL API: $url');
     try {
       final response = await http.get(
         Uri.parse(url),
         headers: {'Authorization': 'Bearer $token'},
       );
-
-      print('Trạng thái API: ${response.statusCode}');
-      print('Dữ liệu thô từ API: ${response.body}');
-
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
-        print('Dữ liệu parsed từ API: $data');
-
         await prefs.setString('userId', data['_id']);
         await prefs.setString('username', data['username']);
         await prefs.setString('email', data['email']);
         await prefs.setString('avatar', data['avt'] ?? '');
-
-        print('Thông tin user đã được lưu thành công.');
-        print('Username lưu: ${prefs.getString('username')}');
-      } else {
-        print('Lỗi server: ${response.statusCode}');
       }
-    } catch (e) {
-      print('Lỗi khi gọi API: $e');
-    }
+    } catch (e) {}
   }
 
   Future<void> sendEmail(
@@ -125,7 +100,6 @@ class Profile extends StatelessWidget {
     String subject,
     String content,
   ) async {
-    // Thay bằng email và App Password của bạn
     const String smtpEmail = 'thientan2408@gmail.com';
     const String smtpPassword = 'dspw eayp dzze yrpj';
 
@@ -139,10 +113,8 @@ class Profile extends StatelessWidget {
           ..text = content;
 
     try {
-      final sendReport = await send(message, smtpServer);
-      print('Email sent: ${sendReport.toString()}');
+      await send(message, smtpServer);
     } catch (e) {
-      print('Error sending email: $e');
       throw Exception('Failed to send email: $e');
     }
   }
@@ -332,6 +304,7 @@ class Profile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF6F7FB),
       body: FutureBuilder<Map<String, dynamic>>(
         future: Future.wait([
           getUserData().then((userData) => {'userData': userData}),
@@ -354,7 +327,6 @@ class Profile extends StatelessWidget {
           }
 
           if (snapshot.hasError) {
-            print('Lỗi trong FutureBuilder: ${snapshot.error}');
             return const Center(child: Text('Đã xảy ra lỗi, vui lòng thử lại'));
           }
 
@@ -368,125 +340,130 @@ class Profile extends StatelessWidget {
           return SingleChildScrollView(
             child: Column(
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      child: SizedBox(
-                        width: 80,
-                        height: 120,
+                // Header with gradient background
+                Container(
+                  width: double.infinity,
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [Color.fromARGB(255, 255, 216, 23), Color.fromARGB(255, 253, 255, 151)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(32),
+                      bottomRight: Radius.circular(32),
+                    ),
+                  ),
+                  padding: const EdgeInsets.only(top: 60, bottom: 24, left: 24, right: 24),
+                  child: Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 45,
+                        backgroundColor: Colors.white,
                         child: CircleAvatar(
-                          radius: 50,
-                          child: ClipOval(
-                            child: Image.network(
-                              isLoggedIn && (avatar != null && avatar.isNotEmpty) ? avatar : defaultAvatar,
-                              width: 80,
-                              height: 80,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                print('Lỗi tải avatar: $error');
-                                return const Icon(
-                                  Icons.person,
-                                  size: 40,
-                                  color: Colors.grey,
-                                );
-                              },
-                            ),
+                          radius: 42,
+                          backgroundImage: NetworkImage(
+                            isLoggedIn && (avatar != null && avatar.isNotEmpty) ? avatar : defaultAvatar,
+                          ),
+                          onBackgroundImageError: (_, __) {},
+                        ),
+                      ),
+                      const SizedBox(width: 18),
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () {
+                            if (!isLoggedIn) {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const LoginPage(),
+                                ),
+                              );
+                            }
+                          },
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                username,
+                                style: const TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                isLoggedIn ? email : 'Chạm để đăng nhập',
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.white70,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        if (!isLoggedIn) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const LoginPage(),
-                            ),
-                          );
-                        }
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.all(10),
-                        child: Text(
-                          username,
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 18),
+                // Card: Quản lý phòng trọ
+                _sectionTitle('Quản lí phòng trọ'),
+                Card(
+                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  elevation: 2,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: Column(
+                      children: [
+                        buildMenuItem(
+                          context,
+                          icon: Icons.home,
+                          color: Colors.blue,
+                          text: 'Phòng trọ còn trống: $availableCount',
+                          onTap: isLoggedIn
+                              ? () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => QlTin()),
+                                  );
+                                }
+                              : null,
                         ),
-                      ),
+                        const Divider(height: 1),
+                        buildMenuItem(
+                          context,
+                          icon: Icons.meeting_room,
+                          color: Colors.green,
+                          text: 'Phòng trọ đã cho thuê: $rentedCount',
+                          onTap: isLoggedIn
+                              ? () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => QlTin()),
+                                  );
+                                }
+                              : null,
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(7),
-                      color: const Color.fromARGB(255, 233, 233, 233),
-                      width: MediaQuery.of(context).size.width,
-                      child: const Text(
-                        'Quản lí phòng trọ',
-                        style: TextStyle(fontSize: 16),
-                      ),
-                    ),
-                  ],
-                ),
-                buildMenuItem(
-                  context,
-                  icon: Icons.home,
-                  color: Colors.blue,
-                  text: 'Phòng trọ còn trống: $availableCount',
-                  onTap:
-                      isLoggedIn
-                          ? () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => QlTin()),
-                            );
-                          }
-                          : null,
-                ),
-                buildMenuItem(
-                  context,
-                  icon: Icons.meeting_room,
-                  color: Colors.green,
-                  text: 'Phòng trọ đã cho thuê: $rentedCount',
-                  onTap:
-                      isLoggedIn
-                          ? () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => QlTin()),
-                            );
-                          }
-                          : null,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(7),
-                      color: const Color.fromARGB(255, 233, 233, 233),
-                      width: MediaQuery.of(context).size.width,
-                      child: const Text(
-                        'Tiện ích',
-                        style: TextStyle(fontSize: 16),
-                      ),
-                    ),
-                  ],
-                ),
-                buildMenuItem(
-                  context,
-                  icon: Icons.bookmark,
-                  color: Colors.purple,
-                  text: 'Tin đăng đã lưu',
-                  onTap:
-                      isLoggedIn
-                          ? () {
+                // Card: Tiện ích
+                _sectionTitle('Tiện ích'),
+                Card(
+                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  elevation: 2,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  child: buildMenuItem(
+                    context,
+                    icon: Icons.bookmark,
+                    color: Colors.purple,
+                    text: 'Tin đăng đã lưu',
+                    onTap: isLoggedIn
+                        ? () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -494,76 +471,68 @@ class Profile extends StatelessWidget {
                               ),
                             );
                           }
-                          : null,
+                        : null,
+                  ),
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(7),
-                      color: const Color.fromARGB(255, 233, 233, 233),
-                      width: MediaQuery.of(context).size.width,
-                      child: const Text(
-                        'Tài khoản',
-                        style: TextStyle(fontSize: 16),
+                // Card: Tài khoản
+                _sectionTitle('Tài khoản'),
+                Card(
+                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  elevation: 2,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  child: Column(
+                    children: [
+                      buildMenuItem(
+                        context,
+                        icon: Icons.settings,
+                        color: Colors.blue,
+                        text: 'Cài đặt tài khoản',
+                        onTap: isLoggedIn
+                            ? () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const AccountSettingsPage(),
+                                  ),
+                                );
+                              }
+                            : null,
                       ),
-                    ),
-                  ],
-                ),
-                buildMenuItem(
-                  context,
-                  icon: Icons.settings,
-                  color: Colors.blue,
-                  text: 'Cài đặt tài khoản',
-                  onTap:
-                      isLoggedIn
-                          ? () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder:
-                                    (context) => const AccountSettingsPage(),
-                              ),
-                            );
-                          }
-                          : null,
-                ),
-                buildMenuItem(
-                  context,
-                  icon: Icons.help,
-                  color: Colors.orange,
-                  text: 'Trợ giúp',
-                  onTap:
-                      isLoggedIn
-                          ? () {
-                            showHelpDialog(context, email);
-                          }
-                          : null,
-                ),
-                buildMenuItem(
-                  context,
-                  icon: Icons.feedback,
-                  color: Colors.green,
-                  text: 'Đóng góp ý kiến',
-                  onTap:
-                      isLoggedIn
-                          ? () {
-                            showFeedbackDialog(context, email);
-                          }
-                          : null,
-                ),
-                buildMenuItem(
-                  context,
-                  icon: Icons.logout,
-                  color: Colors.red,
-                  text: 'Đăng xuất',
-                  onTap:
-                      isLoggedIn
-                          ? () {
-                            showDialog(
-                              context: context,
-                              builder:
-                                  (context) => AlertDialog(
+                      const Divider(height: 1),
+                      buildMenuItem(
+                        context,
+                        icon: Icons.help,
+                        color: Colors.orange,
+                        text: 'Trợ giúp',
+                        onTap: isLoggedIn
+                            ? () {
+                                showHelpDialog(context, email);
+                              }
+                            : null,
+                      ),
+                      const Divider(height: 1),
+                      buildMenuItem(
+                        context,
+                        icon: Icons.feedback,
+                        color: Colors.green,
+                        text: 'Đóng góp ý kiến',
+                        onTap: isLoggedIn
+                            ? () {
+                                showFeedbackDialog(context, email);
+                              }
+                            : null,
+                      ),
+                      const Divider(height: 1),
+                      buildMenuItem(
+                        context,
+                        icon: Icons.logout,
+                        color: Colors.red,
+                        text: 'Đăng xuất',
+                        onTap: isLoggedIn
+                            ? () {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
                                     title: const Text('Xác nhận'),
                                     content: const Text(
                                       'Bạn có chắc chắn muốn đăng xuất không?',
@@ -582,14 +551,35 @@ class Profile extends StatelessWidget {
                                       ),
                                     ],
                                   ),
-                            );
-                          }
-                          : null,
+                                );
+                              }
+                            : null,
+                      ),
+                    ],
+                  ),
                 ),
+                const SizedBox(height: 24),
               ],
             ),
           );
         },
+      ),
+    );
+  }
+
+  Widget _sectionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 24, top: 18, bottom: 4),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Text(
+          title,
+          style: const TextStyle(
+            fontSize: 17,
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF4F8FFF),
+          ),
+        ),
       ),
     );
   }
@@ -601,29 +591,43 @@ class Profile extends StatelessWidget {
     required String text,
     VoidCallback? onTap,
   }) {
-    return Container(
-      padding: const EdgeInsets.all(5),
-      width: MediaQuery.of(context).size.width,
-      height: 50,
-      child: InkWell(
-        onTap: onTap,
-        splashColor: Colors.white,
-        borderRadius: BorderRadius.circular(8.0),
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
         child: Row(
           children: [
             Container(
-              decoration: BoxDecoration(shape: BoxShape.circle, color: color),
-              padding: const EdgeInsets.all(5),
-              child: Icon(icon, size: 17, color: Colors.white),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: color.withOpacity(onTap != null ? 1 : 0.3),
+                boxShadow: onTap != null
+                    ? [
+                        BoxShadow(
+                          color: color.withOpacity(0.25),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ]
+                    : [],
+              ),
+              padding: const EdgeInsets.all(8),
+              child: Icon(icon, size: 22, color: Colors.white),
             ),
-            const SizedBox(width: 5),
-            Text(
-              text,
-              style: TextStyle(
-                fontSize: 16,
-                color: onTap != null ? Colors.black : Colors.grey,
+            const SizedBox(width: 16),
+            Expanded(
+              child: Text(
+                text,
+                style: TextStyle(
+                  fontSize: 16,
+                  color: onTap != null ? Colors.black : Colors.grey,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
+            if (onTap != null)
+              const Icon(Icons.chevron_right, color: Colors.grey, size: 22),
           ],
         ),
       ),
