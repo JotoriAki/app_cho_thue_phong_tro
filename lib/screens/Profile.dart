@@ -345,7 +345,10 @@ class Profile extends StatelessWidget {
                   width: double.infinity,
                   decoration: const BoxDecoration(
                     gradient: LinearGradient(
-                      colors: [Color.fromARGB(255, 255, 216, 23), Color.fromARGB(255, 253, 255, 151)],
+                      colors: [
+                        Color.fromARGB(255, 255, 216, 23),
+                        Color.fromARGB(255, 253, 255, 151),
+                      ],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
@@ -354,7 +357,12 @@ class Profile extends StatelessWidget {
                       bottomRight: Radius.circular(32),
                     ),
                   ),
-                  padding: const EdgeInsets.only(top: 60, bottom: 24, left: 24, right: 24),
+                  padding: const EdgeInsets.only(
+                    top: 60,
+                    bottom: 24,
+                    left: 24,
+                    right: 24,
+                  ),
                   child: Row(
                     children: [
                       CircleAvatar(
@@ -363,7 +371,9 @@ class Profile extends StatelessWidget {
                         child: CircleAvatar(
                           radius: 42,
                           backgroundImage: NetworkImage(
-                            isLoggedIn && (avatar != null && avatar.isNotEmpty) ? avatar : defaultAvatar,
+                            isLoggedIn && (avatar != null && avatar.isNotEmpty)
+                                ? avatar
+                                : defaultAvatar,
                           ),
                           onBackgroundImageError: (_, __) {},
                         ),
@@ -389,7 +399,7 @@ class Profile extends StatelessWidget {
                                 style: const TextStyle(
                                   fontSize: 22,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.white,
+                                  color: Colors.black,
                                 ),
                               ),
                               const SizedBox(height: 6),
@@ -397,7 +407,7 @@ class Profile extends StatelessWidget {
                                 isLoggedIn ? email : 'Chạm để đăng nhập',
                                 style: const TextStyle(
                                   fontSize: 14,
-                                  color: Colors.white70,
+                                  color: Colors.black,
                                 ),
                               ),
                             ],
@@ -411,9 +421,14 @@ class Profile extends StatelessWidget {
                 // Card: Quản lý phòng trọ
                 _sectionTitle('Quản lí phòng trọ'),
                 Card(
-                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                   elevation: 2,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     child: Column(
@@ -423,14 +438,17 @@ class Profile extends StatelessWidget {
                           icon: Icons.home,
                           color: Colors.blue,
                           text: 'Phòng trọ còn trống: $availableCount',
-                          onTap: isLoggedIn
-                              ? () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(builder: (context) => QlTin()),
-                                  );
-                                }
-                              : null,
+                          onTap:
+                              isLoggedIn
+                                  ? () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => QlTin(),
+                                      ),
+                                    );
+                                  }
+                                  : null,
                         ),
                         const Divider(height: 1),
                         buildMenuItem(
@@ -438,14 +456,17 @@ class Profile extends StatelessWidget {
                           icon: Icons.meeting_room,
                           color: Colors.green,
                           text: 'Phòng trọ đã cho thuê: $rentedCount',
-                          onTap: isLoggedIn
-                              ? () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(builder: (context) => QlTin()),
-                                  );
-                                }
-                              : null,
+                          onTap:
+                              isLoggedIn
+                                  ? () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => QlTin(),
+                                      ),
+                                    );
+                                  }
+                                  : null,
                         ),
                       ],
                     ),
@@ -454,32 +475,43 @@ class Profile extends StatelessWidget {
                 // Card: Tiện ích
                 _sectionTitle('Tiện ích'),
                 Card(
-                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                   elevation: 2,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                   child: buildMenuItem(
                     context,
                     icon: Icons.bookmark,
                     color: Colors.purple,
                     text: 'Tin đăng đã lưu',
-                    onTap: isLoggedIn
-                        ? () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const SavedRoomsPage(),
-                              ),
-                            );
-                          }
-                        : null,
+                    onTap:
+                        isLoggedIn
+                            ? () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const SavedRoomsPage(),
+                                ),
+                              );
+                            }
+                            : null,
                   ),
                 ),
                 // Card: Tài khoản
                 _sectionTitle('Tài khoản'),
                 Card(
-                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                   elevation: 2,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                   child: Column(
                     children: [
                       buildMenuItem(
@@ -487,16 +519,19 @@ class Profile extends StatelessWidget {
                         icon: Icons.settings,
                         color: Colors.blue,
                         text: 'Cài đặt tài khoản',
-                        onTap: isLoggedIn
-                            ? () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const AccountSettingsPage(),
-                                  ),
-                                );
-                              }
-                            : null,
+                        onTap:
+                            isLoggedIn
+                                ? () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder:
+                                          (context) =>
+                                              const AccountSettingsPage(),
+                                    ),
+                                  );
+                                }
+                                : null,
                       ),
                       const Divider(height: 1),
                       buildMenuItem(
@@ -504,11 +539,12 @@ class Profile extends StatelessWidget {
                         icon: Icons.help,
                         color: Colors.orange,
                         text: 'Trợ giúp',
-                        onTap: isLoggedIn
-                            ? () {
-                                showHelpDialog(context, email);
-                              }
-                            : null,
+                        onTap:
+                            isLoggedIn
+                                ? () {
+                                  showHelpDialog(context, email);
+                                }
+                                : null,
                       ),
                       const Divider(height: 1),
                       buildMenuItem(
@@ -516,11 +552,12 @@ class Profile extends StatelessWidget {
                         icon: Icons.feedback,
                         color: Colors.green,
                         text: 'Đóng góp ý kiến',
-                        onTap: isLoggedIn
-                            ? () {
-                                showFeedbackDialog(context, email);
-                              }
-                            : null,
+                        onTap:
+                            isLoggedIn
+                                ? () {
+                                  showFeedbackDialog(context, email);
+                                }
+                                : null,
                       ),
                       const Divider(height: 1),
                       buildMenuItem(
@@ -528,32 +565,35 @@ class Profile extends StatelessWidget {
                         icon: Icons.logout,
                         color: Colors.red,
                         text: 'Đăng xuất',
-                        onTap: isLoggedIn
-                            ? () {
-                                showDialog(
-                                  context: context,
-                                  builder: (context) => AlertDialog(
-                                    title: const Text('Xác nhận'),
-                                    content: const Text(
-                                      'Bạn có chắc chắn muốn đăng xuất không?',
-                                    ),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () => Navigator.pop(context),
-                                        child: const Text('Hủy'),
-                                      ),
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.pop(context);
-                                          logout(context);
-                                        },
-                                        child: const Text('Đăng xuất'),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              }
-                            : null,
+                        onTap:
+                            isLoggedIn
+                                ? () {
+                                  showDialog(
+                                    context: context,
+                                    builder:
+                                        (context) => AlertDialog(
+                                          title: const Text('Xác nhận'),
+                                          content: const Text(
+                                            'Bạn có chắc chắn muốn đăng xuất không?',
+                                          ),
+                                          actions: [
+                                            TextButton(
+                                              onPressed:
+                                                  () => Navigator.pop(context),
+                                              child: const Text('Hủy'),
+                                            ),
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                                logout(context);
+                                              },
+                                              child: const Text('Đăng xuất'),
+                                            ),
+                                          ],
+                                        ),
+                                  );
+                                }
+                                : null,
                       ),
                     ],
                   ),
@@ -602,15 +642,16 @@ class Profile extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: color.withOpacity(onTap != null ? 1 : 0.3),
-                boxShadow: onTap != null
-                    ? [
-                        BoxShadow(
-                          color: color.withOpacity(0.25),
-                          blurRadius: 8,
-                          offset: const Offset(0, 2),
-                        ),
-                      ]
-                    : [],
+                boxShadow:
+                    onTap != null
+                        ? [
+                          BoxShadow(
+                            color: color.withOpacity(0.25),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ]
+                        : [],
               ),
               padding: const EdgeInsets.all(8),
               child: Icon(icon, size: 22, color: Colors.white),

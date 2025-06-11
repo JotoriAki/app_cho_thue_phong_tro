@@ -267,168 +267,182 @@ class HomePageState extends State<HomePage> {
         ),
         backgroundColor: Colors.white,
         centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications, color: Color(0xFF222222)),
-            onPressed: () {},
-          ),
-        ],
       ),
       body: RefreshIndicator(
         onRefresh: _loadData,
-        child: _isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Banner
-                    Container(
-                      width: double.infinity,
-                      margin: const EdgeInsets.only(bottom: 18),
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [Colors.yellow[700]!, Colors.orange[300]!],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        borderRadius: const BorderRadius.only(
-                          bottomLeft: Radius.circular(15),
-                          bottomRight: Radius.circular(15),
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.yellow[700]!.withOpacity(0.18),
-                            blurRadius: 12,
-                            offset: const Offset(0, 6),
+        child:
+            _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Banner
+                      Container(
+                        width: double.infinity,
+                        margin: const EdgeInsets.only(bottom: 18),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [Colors.yellow[700]!, Colors.orange[300]!],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
                           ),
-                        ],
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(20, 28, 20, 28),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: DropdownButtonHideUnderline(
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(16),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.07),
-                                        blurRadius: 6,
-                                        offset: const Offset(0, 2),
+                          borderRadius: const BorderRadius.only(
+                            bottomLeft: Radius.circular(15),
+                            bottomRight: Radius.circular(15),
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.yellow[700]!.withOpacity(0.18),
+                              blurRadius: 12,
+                              offset: const Offset(0, 6),
+                            ),
+                          ],
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(20, 28, 20, 28),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: DropdownButtonHideUnderline(
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(16),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.07),
+                                          blurRadius: 6,
+                                          offset: const Offset(0, 2),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 16,
                                       ),
-                                    ],
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                                    child: DropdownButton<String>(
-                                      value: _selectedDistrict,
-                                      hint: const Text('Chọn quận'),
-                                      isExpanded: true,
-                                      icon: const Icon(Icons.keyboard_arrow_down),
-                                      items: getDistricts().map((String district) {
-                                        return DropdownMenuItem<String>(
-                                          value: district,
-                                          child: Text(
-                                            district,
-                                            style: const TextStyle(fontWeight: FontWeight.w500),
-                                          ),
-                                        );
-                                      }).toList(),
-                                      onChanged: (String? newValue) {
-                                        filterRoomsByDistrict(newValue);
-                                      },
+                                      child: DropdownButton<String>(
+                                        value: _selectedDistrict,
+                                        hint: const Text('Chọn quận'),
+                                        isExpanded: true,
+                                        icon: const Icon(
+                                          Icons.keyboard_arrow_down,
+                                        ),
+                                        items:
+                                            getDistricts().map((
+                                              String district,
+                                            ) {
+                                              return DropdownMenuItem<String>(
+                                                value: district,
+                                                child: Text(
+                                                  district,
+                                                  style: const TextStyle(
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
+                                                ),
+                                              );
+                                            }).toList(),
+                                        onChanged: (String? newValue) {
+                                          filterRoomsByDistrict(newValue);
+                                        },
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
-                            const SizedBox(width: 18),
-                            Material(
-                              color: Colors.white,
-                              shape: const CircleBorder(),
-                              elevation: 2,
-                              child: InkWell(
-                                borderRadius: BorderRadius.circular(30),
-                                onTap: () {},
-                                child: Padding(
-                                  padding: const EdgeInsets.all(10),
-                                  child: Icon(Icons.search, color: Colors.yellow[700], size: 30),
+                              const SizedBox(width: 18),
+                              Material(
+                                color: Colors.white,
+                                shape: const CircleBorder(),
+                                elevation: 2,
+                                child: InkWell(
+                                  borderRadius: BorderRadius.circular(30),
+                                  onTap: () {},
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(10),
+                                    child: Icon(
+                                      Icons.search,
+                                      color: Colors.yellow[700],
+                                      size: 30,
+                                    ),
+                                  ),
                                 ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      // Section title
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(24, 8, 24, 12),
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.star_rounded,
+                              color: Colors.amber,
+                              size: 28,
+                            ),
+                            const SizedBox(width: 10),
+                            const Text(
+                              "Chợ Tốt Có Gì Mới?",
+                              style: TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF222222),
                               ),
                             ),
                           ],
                         ),
                       ),
-                    ),
-                    // Section title
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(24, 8, 24, 12),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.star_rounded, color: Colors.amber, size: 28),
-                          const SizedBox(width: 10),
-                          const Text(
-                            "Chợ Tốt Có Gì Mới?",
-                            style: TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF222222),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    // Grid
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      child: GridView.builder(
-                        itemCount: _filteredPhongTroData.length,
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 1,
-                          crossAxisSpacing: 18,
-                          mainAxisSpacing: 18,
-                          childAspectRatio: 2.7,
-                        ),
-                        itemBuilder: (context, index) {
-                          final item = _filteredPhongTroData[index];
-                          return GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => RoomDetailPage(
-                                    roomId: item['_id'],
+                      // Grid
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: GridView.builder(
+                          itemCount: _filteredPhongTroData.length,
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 1,
+                                crossAxisSpacing: 18,
+                                mainAxisSpacing: 18,
+                                childAspectRatio: 2.7,
+                              ),
+                          itemBuilder: (context, index) {
+                            final item = _filteredPhongTroData[index];
+                            return GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder:
+                                        (context) =>
+                                            RoomDetailPage(roomId: item['_id']),
                                   ),
-                                ),
-                              );
-                            },
-                            child: _buildRoomCard(
-                              item['title'] ?? 'Không có tiêu đề',
-                              item['price'] != null
-                                  ? '${NumberFormat.currency(locale: 'vi_VN', symbol: '₫').format(item['price'])}/Tháng'
-                                  : 'Không có giá',
-                              item['images'] != null && item['images'].isNotEmpty
-                                  ? item['images'][0]
-                                  : 'assets/placeholder.jpg',
-                              item['_id'] ?? '',
-                              item['address'] ?? 'Không xác định',
-                              item['status'] ?? 'rented',
-                            ),
-                          );
-                        },
+                                );
+                              },
+                              child: _buildRoomCard(
+                                item['title'] ?? 'Không có tiêu đề',
+                                item['price'] != null
+                                    ? '${NumberFormat.currency(locale: 'vi_VN', symbol: '₫').format(item['price'])}/Tháng'
+                                    : 'Không có giá',
+                                item['images'] != null &&
+                                        item['images'].isNotEmpty
+                                    ? item['images'][0]
+                                    : 'assets/placeholder.jpg',
+                                item['_id'] ?? '',
+                                item['address'] ?? 'Không xác định',
+                                item['status'] ?? 'rented',
+                              ),
+                            );
+                          },
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 28),
-                  ],
+                      const SizedBox(height: 28),
+                    ],
+                  ),
                 ),
-              ),
       ),
     );
   }
@@ -465,52 +479,53 @@ class HomePageState extends State<HomePage> {
                 borderRadius: const BorderRadius.horizontal(
                   left: Radius.circular(22),
                 ),
-                child: isValidUrl(imagePath)
-                    ? Image.network(
-                        imagePath,
-                        height: 120,
-                        width: 120,
-                        fit: BoxFit.cover,
-                        loadingBuilder: (context, child, loadingProgress) {
-                          if (loadingProgress == null) {
-                            return child;
-                          }
-                          return Container(
-                            height: 120,
-                            width: 120,
-                            color: Colors.grey[200],
-                            child: const Center(
-                              child: CircularProgressIndicator(),
-                            ),
-                          );
-                        },
-                        errorBuilder: (context, error, stackTrace) {
-                          return Container(
-                            height: 120,
-                            width: 120,
-                            color: Colors.grey[200],
-                            child: const Center(
-                              child: Icon(
-                                Icons.broken_image,
-                                size: 50,
-                                color: Colors.black,
+                child:
+                    isValidUrl(imagePath)
+                        ? Image.network(
+                          imagePath,
+                          height: 120,
+                          width: 120,
+                          fit: BoxFit.cover,
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) {
+                              return child;
+                            }
+                            return Container(
+                              height: 120,
+                              width: 120,
+                              color: Colors.grey[200],
+                              child: const Center(
+                                child: CircularProgressIndicator(),
                               ),
+                            );
+                          },
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              height: 120,
+                              width: 120,
+                              color: Colors.grey[200],
+                              child: const Center(
+                                child: Icon(
+                                  Icons.broken_image,
+                                  size: 50,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            );
+                          },
+                        )
+                        : Container(
+                          height: 120,
+                          width: 120,
+                          color: Colors.grey[200],
+                          child: const Center(
+                            child: Icon(
+                              Icons.broken_image,
+                              size: 50,
+                              color: Colors.black,
                             ),
-                          );
-                        },
-                      )
-                    : Container(
-                        height: 120,
-                        width: 120,
-                        color: Colors.grey[200],
-                        child: const Center(
-                          child: Icon(
-                            Icons.broken_image,
-                            size: 50,
-                            color: Colors.black,
                           ),
                         ),
-                      ),
               ),
               Positioned(
                 top: 10,
@@ -530,7 +545,9 @@ class HomePageState extends State<HomePage> {
                     ),
                     padding: const EdgeInsets.all(7),
                     child: Icon(
-                      isSaved ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
+                      isSaved
+                          ? Icons.bookmark_rounded
+                          : Icons.bookmark_border_rounded,
                       color: Colors.yellow[700],
                       size: 26,
                     ),
@@ -570,12 +587,19 @@ class HomePageState extends State<HomePage> {
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      const Icon(Icons.location_on, size: 16, color: Colors.grey),
+                      const Icon(
+                        Icons.location_on,
+                        size: 16,
+                        color: Colors.grey,
+                      ),
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
                           districtAndCity,
-                          style: const TextStyle(fontSize: 13, color: Colors.black54),
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: Colors.black54,
+                          ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -586,9 +610,15 @@ class HomePageState extends State<HomePage> {
                   Align(
                     alignment: Alignment.bottomRight,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 5,
+                      ),
                       decoration: BoxDecoration(
-                        color: status == 'available' ? Colors.green[600] : Colors.red[400],
+                        color:
+                            status == 'available'
+                                ? Colors.green[600]
+                                : Colors.red[400],
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Text(
